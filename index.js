@@ -1,33 +1,3 @@
-// FILES
-/* const hello = 'Hello World';
-console.log(hello) */
-
-/* const fs = require("fs");
-
-const textIn = fs.readFileSync("./txt/input.txt", "utf-8");
-console.log(textIn);
-
-const textOut = `This is the Text in the file: ${textIn}`;
-fs.writeFileSync("./txt/output.txt", textOut);
-console.log("File Created!");
- */
-
-/* // CREATING A SIMPLE WEB SERVER
-const http = require('http');
-const url = require('url');
-
-
-// SERVER
-const server = http.createServer((req, res) => {
-    // console.log(req);
-    console.log(req.url);
-    res.end('Hello from the server');
-});
-
-server.listen(8000, '127.0.0.1', () => {
-    console.log('Listening to requests on port 8000');
-}); */
-
 // CREATING A SIMPLE WEB SERVER WITH ROUTER
 const fs = require("fs");
 const http = require("http");
@@ -68,10 +38,12 @@ const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8");
 const dataObj = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
-    const pathName = req.url;
+     const { query, pathname } = url.parse(req.url, true);
+    // console.log(url.parse(req.url, true));
+    // const pathname = req.url;
 
     // Overview page
-    if (pathName === "/" || pathName === "/overview") {
+    if (pathname === "/" || pathname === "/overview") {
         res.writeHead(200, { "Content-type": "text/html" });
 
         const cardsHtml = dataObj
@@ -82,11 +54,17 @@ const server = http.createServer((req, res) => {
         res.end(output);
 
         // Product page
-    } else if (pathName === "/product") {
-        res.end("This is the PRODUCT");
+    } else if (pathname === "/product") {
+        res.writeHead(200, { 'Content-type': 'text/html' });
+        const product = dataObj[query.id];
+        const output = replaceTemplate(tempProduct, product);
+        res.end(output);
+
+        // console.log(query);
+        // res.end("This is the PRODUCT");
 
         // API
-    } else if (pathName === "/api") {
+    } else if (pathname === "/api") {
         res.writeHead(200, { "Content-type": "application/json" });
         res.end(data);
 
